@@ -37,7 +37,6 @@ class Patrol:
 
     def lookup(self, poi_name):  # type: (str) -> Point
         request = PoiNameLocatorRequest(poi_name)
-        #gets coordinates based on poi name - like what the server and the client do 
 
         # response cannot be None. If server tries to return None, a rospy.ServiceException will raise here.
         response = self.poi_name_locator_callable(request)  # type: PoiNameLocatorResponse
@@ -45,7 +44,7 @@ class Patrol:
         return response.position
 
     def patrol(self, poi1, poi2):  # type: (str, str) -> None
-        point1 = self.lookup(poi1)  # type: Point  -- uses the lookup method to get two points that the robot will travel between
+        point1 = self.lookup(poi1)  # type: Point
         point2 = self.lookup(poi2)  # type: Point
 
         goal = MoveBaseGoal()
@@ -96,4 +95,3 @@ class Patrol:
 if __name__ == "__main__":
     patrol = Patrol()
     patrol.patrol('foyer_adjacent_rm245_main_office', 'hall1_adjacent_rm204_kitchenette')
-    #should these be the requests from the client instead of hard coded?

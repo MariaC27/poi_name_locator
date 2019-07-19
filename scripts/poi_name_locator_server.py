@@ -2,6 +2,8 @@
 from __future__ import print_function
 
 from geometry_msgs.msg import Point
+from std_msgs.msg import String 
+from collections import OrderedDict
 
 import rospy
 import rospkg
@@ -11,6 +13,10 @@ import os
 from poi_name_locator.srv import PoiNameLocator
 from poi_name_locator.srv import PoiNameLocatorRequest
 from poi_name_locator.srv import PoiNameLocatorResponse
+from poi_name_locator.srv import PoiNames
+from poi_name_locator.srv import PoiNamesRequest
+from poi_name_locator.srv import PoiNamesResponse
+
 
 class PoiNameLocatorServer:
     def __init__(self):
@@ -18,7 +24,6 @@ class PoiNameLocatorServer:
         #   x = self.poi['elevator_adjacent_foyer']['x']
         #   y = self.poi['elevator_adjacent_foyer']['y']
         self.poi = None  # type: dict
-        #initialized like this until you give it a room name 
 
     # TODO: Create a subscriber that allows users to publish a new locations_from_package and locations_from_file
     # so users can switch to a different map or set of named locations.
@@ -50,7 +55,6 @@ class PoiNameLocatorServer:
 
         with open(locations_yml_path, "r") as f:
             self.poi = yaml.load(f.read())
-            #reads/loads the yaml file 
 
     def handle_poi_name_locator_request(self, request):  # type: (PoiNameLocatorRequest) -> PoiNameLocatorResponse
         poi_name = request.poi_name  # type: str
@@ -66,18 +70,34 @@ class PoiNameLocatorServer:
         retval.y = self.poi[poi_name]['y']
         retval.z = 0
         return PoiNameLocatorResponse(retval)
+        
+    def handle_poi_get_names(self, request):  # type: (PoiNameLocatorRequest) -> PoiNameLocatorResponse
+        #poi_name = request.poi_name  # type: str
+       
+		retlist = []
+        
+		for key in self.poi.keys(): 
+			nextString = String()
+			nextString.data = key
+			retlist.append(nextString)
+			
+
+		return PoiNamesResponse(retlist)        
+        
+        
 
     def spin(self):
         rospy.init_node('poi_name_locator_server')
         self.load()
-        s = rospy.Service('poi_name_locator', PoiNameLocator, self.handle_poi_name_locator_request)
-        #call the method from above that transforms request string into response coordinates 
+        
+        
+        s1 = rospy.Service('poi_name_locator', PoiNameLocator, self.handle_poi_name_locator_request)
+        s2 = rospy.Service('poi_names',PoiNames, self.handle_poi_get_names)
+        
         rospy.loginfo("Ready to lookup POI locations by name.")
         rospy.spin()
 
 
 if __name__ == '__main__':
     poi_name_server = PoiNameLocatorServer()
-    #inintialize 
     poi_name_server.spin()
-    #then call the spin method that subsequently calls the handle_poi_name method 
