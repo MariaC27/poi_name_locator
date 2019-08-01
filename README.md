@@ -57,3 +57,7 @@ On the turtlebot, set the pose estimate:
 And finally, run the patrol:
 
     rosrun poi_name_locator poi_name_patrol.py
+    
+Can also run Door to Door program, which stops at each door in the hallway for 5 sec before proceeding to the next
+
+    rosrun poi_name_locator MoveDoorToDoor.py
